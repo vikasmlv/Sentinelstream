@@ -1,0 +1,25 @@
+# Override for EC2:  docker compose -f docker-compose.yml -f docker-compose.aws.yml up -d --build
+# Uses the REAL DynamoDB table via the instance IAM role (no local emulator, no static keys).
+x-aws-env: &aws-env
+  DYNAMODB_ENDPOINT: ""
+  AWS_ACCESS_KEY_ID: ""
+  AWS_SECRET_ACCESS_KEY: ""
+  AWS_REGION: ${AWS_REGION:-ap-south-1}
+  DDB_WCU: ${DDB_WCU:-25}
+  DDB_RCU: ${DDB_RCU:-25}
+  APPROVE_SAMPLE_RATE: ${APPROVE_SAMPLE_RATE:-0.01}
+
+services:
+  dynamodb:
+    profiles: ["disabled"]
+  kafka:
+    environment:
+      KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
+  init:
+    environment: *aws-env
+    depends_on:
+      kafka: {condition: service_healthy}
+  scorer:
+    environment: *aws-env
+  consumer:
+    environment: *aws-env

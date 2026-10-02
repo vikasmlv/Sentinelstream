@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+data/raw/
+data/processed/
+results/*
+!results/.gitkeep
+models/*
+!models/.gitkeep
+.env
+*.egg-info/
+venv/
